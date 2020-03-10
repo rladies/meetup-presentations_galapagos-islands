@@ -1,0 +1,83 @@
+---
+title: "Primer Evento de R-Ladies Galápagos"
+author: "Denisse Fierro Arcos"
+date: "2020-03-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introducción
+
+Utilizando datos de empleo y género del Banco Mundial disponibles a través de datos de miércoles <https://github.com/cienciadedatos/datos-de-miercoles/tree/master/datos/2019/2019-10-16>, aplicaremos lo que aprendimos hoy.
+
+### Activando bibliotecas
+```{r bibliotecas, warning=FALSE}
+library(openxlsx)
+library(tidyverse)
+library(ggplot2)
+```
+
+### Cargando datos a R
+```{r datos}
+empleo_genero <- read.xlsx("../Data/Empleo_Genero.xlsx")
+head(empleo_genero, n = 5)
+```
+
+### Manipulando datos - Ejemplo 1
+gather() es equivalente a pivot_longer()\
+Porcentajes en las columnas de años incluidos como filas por país
+```{r pivot_longer}
+empleo_genero <- empleo_genero %>% tbl_df() %>% pivot_longer(paste(c(1970:2018)), names_to = "año", values_to = "porcentaje")
+head(empleo_genero, n = 5)
+```
+
+#### Graficos - Ejemplo 1 
+```{r grafico1}
+#Utilizando la base de datos que acabamos de manipular, filtremos solamente la variable desempleo. Luego creamos un gráfico utilizando ggplot
+p1 <- empleo_genero %>% 
+  filter(variable == "desempleo_mujeres" | variable == "desempleo_hombres") %>% 
+  filter_at(vars(porcentaje), any_vars(!is.na(.))) %>% 
+  #Si prefieres puedes filtrar informacion de solo ciertos países utilizando la función filter_at en la variable 'pais_region'
+  # filter_at(vars(pais_region), 
+  #           any_vars(. == "Ecuador" | . == "Colombia" | . == "Perú")) %>%
+  #Agrupamos los datos por país
+  group_by(pais_region) %>% 
+  #Ahora utilizamos estos datos filtrados para crear un gráfico, con la función aes pasamos información sobre ejes x & y. La opción color será utilizada para variar el color de los puntos basados en una variable en particular
+  ggplot(aes(x = año, y = porcentaje, color = variable))+
+  #Crea puntos utilizando las variables incluidas en x & y
+  geom_point()+
+  #Crea líneas utilizando las variables incluidas en x & y, le decimos que las líneas deben conectar a los elementos por cada grupo incluido en la columna variable
+  geom_line(aes(group = variable))+
+  #Nos ayuda a crear un gráfico por país en un mismo panel
+  facet_wrap(~pais_region)+
+  #El texto del axis x se mueve 90 grados
+  theme(axis.text.x = element_text(angle = 90))
+#Finalmente guardamos nuestro gráfico
+ggsave("../Outputs/Desempleo_Mujeres_Hombres.tiff", p1, device = "tiff", dpi = 500)
+p1
+```
+
+### Manipulando datos - Ejemplo 2
+spread() es equivalente a pivot_wider()\
+Porcentajes dividos en columnas por cada valor incluido bajo la columna variable
+```{r pivot wider}
+empleo_genero2 <-  empleo_genero %>% pivot_wider(names_from = variable, values_from = porcentaje)
+head(empleo_genero2, n = 5)
+```
+
+### Graficos - Ejemplo 2
+```{r grafico2}
+p2 <- empleo_genero2 %>% 
+  select_at(vars(pais_region, año, desempleo_mujeres)) %>% 
+  filter_if(is.numeric, any_vars(!is.na(.))) %>% 
+  filter(pais_region == "Ecuador" | pais_region == "Colombia" | pais_region == "Perú") %>% 
+  ggplot(aes(x = año, y = 100-desempleo_mujeres, color = pais_region))+
+  geom_point()+geom_path(aes(group = pais_region))+
+  labs(y = "Porcentaje de mujeres con empleo")+
+  theme(axis.text.x = element_text(angle = 90))
+ggsave("../Outputs/Desempleo_Mujeres_Pais.tiff", p2, device = "tiff", dpi = 400)
+p2
+```
