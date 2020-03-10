@@ -1,6 +1,7 @@
-(English below) <br>
 Material utilizado durante nuestro taller de apertura. Los datos utilizados son de empleo y género del Banco Mundial disponibles
 a través de Datos de Miércoles: <https://github.com/cienciadedatos/datos-de-miercoles/tree/master/datos/2019/2019-10-16> <br>
-<br>
-Material used during our opening meetup. The data used was about employment and gender from the International Bank and available 
-through Datos de Miércoles (spanish version of Tidy Tuesday): <https://github.com/cienciadedatos/datos-de-miercoles/tree/master/datos/2019/2019-10-16> 
+La foto llamada Carpetas te indica como debe estar guardada la información: <br>
+Data: contiene base de datos Empleo_Genero.xlsx <br>
+Outputs: servirá para guardar los gráficos producidos en el script <br>
+Presentaciones: contiene la presentación en powerpoint <br>
+Scripts: contiene los archivos de Rmarkdown y html llamados PrimerEvento_RLadiesGps <br>
