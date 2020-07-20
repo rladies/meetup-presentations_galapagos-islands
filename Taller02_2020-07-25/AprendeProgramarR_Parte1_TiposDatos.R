@@ -420,6 +420,10 @@ df
 class(df)
 str(df)
 
+#Alternativamente podemos crear una columna adicional
+df$Ciudad2 <- Ciudad
+df
+
 #Agregando/resumiendo información basado en la columna de factores (ciudad)
 table(df$Ciudad)
 table(df['Ciudad'])
@@ -455,6 +459,15 @@ length(Encuesta$Nombres)
 Encuesta$ID <- seq(1, 16, by = 3)
 Encuesta
 
+#Agregando un nuevo elemento a la lista
+Encuesta$ID <- ID
+
 #Cambiar contenido de un sub-elemento de la lista
 Encuesta$Encuestador[2] <- "Pedro"
 Encuesta
+
+#Accediendo nombres de los elementos de la lista y cambiandolos
+names(Encuesta)
+names(Encuesta)[1] <- "Identificación"
+names(Encuesta)
+
