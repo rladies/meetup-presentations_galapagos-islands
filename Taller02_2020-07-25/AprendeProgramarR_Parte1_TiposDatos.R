@@ -2,7 +2,8 @@
 #Autor: Denisse Fierro Arcos, R-Ladies Galapagos
 #Fecha: 2020-07-19
 #Detalles: En este script veremos los diferentes tipos de datos que podemos manipular
-#en R, así #como practicar crear variables
+#en R, asi
+#como practicar crear variables
 
 
 # Caracteres --------------------------------------------------------------
@@ -75,7 +76,7 @@ class(z*z)
 class(z^2)
 
 (x+y)*(-z)
-
+x+y*(-z)
 
 # Asignando resultados de cálculos a variables ----------------------------
 #A una nueva variable
