@@ -4,6 +4,6 @@ Esta carpeta contiene los scripts utilizados en la parte 2 del taller gratuito '
   
 Este taller se basa en el libro: Santana & Farfán. 2014. El arte de programar en R. Un lenguaje para la estadística. Disponible en https://bit.ly/2ZJnmAe.  
   
-Puedes acceder al documento de Google Colab para colaborar en vivo aquí: https://bit.ly/3gjohwT.  
+Puedes acceder al documento de Google Colab para colaborar en vivo aquí: https://colab.research.google.com/drive/1_gfPTLlzYcdUsXVXVa8vdu4M7retjg7U?usp=sharing.  
   
 Los documentos aquí disponibles son de libre acceso.
