@@ -1,8 +1,8 @@
-#Taller: Aprende a programar en R - Parte 2: Tipos de objetos y funciones
+#Taller: Aprende a programar en R - Parte 3: Subconjuntos y funciones
 #Autor: Denisse Fierro Arcos, R-Ladies Galapagos
-#Fecha: 2020-07-30
-#Detalles: En este script veremos los diferentes tipos de objetos que podemos manipular
-#en R, asi como funciones basicas
+#Fecha: 2020-08-07
+#Detalles: En este script veremos como acceder a subconjuntos de datos y continuamos
+#con las funciones
 
 # Matrices ----------------------------------------------------------------
 #Creando una matriz basada en una sequencia
