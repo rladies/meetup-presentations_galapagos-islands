@@ -4,291 +4,132 @@
 #Detalles: En este script veremos como acceder a subconjuntos de datos y continuamos
 #con las funciones
 
-# Matrices ----------------------------------------------------------------
-#Creando una matriz basada en una sequencia
-#Podemos definit el numero de filas
-x <- matrix(1:30, nrow = 5)
-x
-length(x)
-dim(x)
-class(x)
-#O el numero de columnas
-y <- matrix(seq(2,100, by = 5), ncol = 10)
-y
-dim(y)
-#O ambos
-z <- matrix(rep(10, 20), ncol = 5, nrow = 4)
-z
-#Podemos definir si la matriz es llenada por columnas o filas
-matrix(1:30, nrow = 5, byrow = FALSE) #por columna
-matrix(1:30, nrow = 5, byrow = T) #por file
 
-#Podemos crear matrices basadas en vectores existentes
-x <- seq(1:50)
-x
-xMat <- matrix(x, nrow = 10) #ordenadas por columna
-xMat
-xMatFila <- matrix(x, nrow = 10, byrow = T) #ordenadas por fila
-xMatFila
+# Bibliotecas -------------------------------------------------------------
+#Llamamos a bibliotecas relevantes para este taller
+library(tidyverse)
 
-#Podemos combinar matrices para crear matrices mas grandes
-#Una sobre otra con rbind()
-xFila <- rbind(xMat, xMatFila)
-xFila
-#Una al lado de la otra con cbind()
-xCol <- cbind(xMat, xMatFila)
-xCol
+# Accediendo a subconjunto de datos ---------------------------------------
+#Primero vamos a acceder a datos de Partidos de las Copas del Mundo de Fútbol
+#(1930 a 2018) disponibles en Datos de Miercoles. Mas informacion aqui: 
+#https://github.com/cienciadedatos/datos-de-miercoles/tree/master/datos/2019/2019-04-10
 
+#Aqui le damos el vinculo donde los datos estan guardados y a traves de delim le 
+#decimos que el delimitador utilizado en esta base de datos en un tab
+df <- read_delim("https://bit.ly/31wcrt9", delim = "\t") %>% 
+  #Aqui especificamos que queremos que sea guardado como un data frame
+  data.frame()
 
-# Cambiando el nombre de columnas y filas ---------------------------------
-xCol
-colnames(xCol)
-colnames(xCol) <- c("Uno", "Dos", "Tres", "Cuatro", "Cinco", "Seis",  "Siete",
-                    "Ocho", "Nueve", "Diez")
-colnames(xCol)
-xCol
-
-rownames(xCol)
-rownames(xCol) <- c("uno", "dos", "tres", "cuatro", "cinco", "seis", "siete", 
-                    "ocho", "nueve", "diez")
-rownames(xCol)
-xCol
-
-
-# Accediendo elementos de la matriz ---------------------------------------
-#Por filas
-xFila
-xFila[1,]
-xFila[1:3,]
-xFila[c(1, 5),]
-xCol["uno",]
-
-#Por columna
-xFila[,1]
-xFila[,3:5]
-xFila[,c(2, 4)]
-xCol[,"Uno"]
-
-#Por elemento
-xFila[1,5]
-xFila[15,3]
-xCol["cuatro", "Tres"]
-
-#Podemos reemplazar los valores de elementos específicos
-xCol
-xCol[1,] <- 3
-xCol
-xCol[,1] <- rep(1:5, 2)
-xCol
-xCol[6,10] <- 100
-xCol
-xCol["cuatro", "Tres"] <- 350
-xCol
-
-#Podemos también cambiar el nombre de una columna o fila específica
-colnames(xCol)[5]
-colnames(xCol)[5] <- "CINCO"
-colnames(xCol)
-rm(xCol, xFila, xMat, xMatFila, x, y, z)
-
-
-# Data frames -------------------------------------------------------------
-#Creando un data frame vacio
-df <- data.frame()
-
-#Creando un data frame con varias columnas
-df <- data.frame(ID = c(1:5), 
-                 Nombres = c("Elena", "Isabela", "Juan", "Pedro", "Lola"),
-                 Edades = c(rep(30, 3), 15, 18))
-df
-dim(df)
-class(df)
-
-#Creando data frame basado en otros vectores
-ID <- c(1:5)
-Nombres <- c("Elena", "Isabela", "Juan", "Pedro", "Lola")
-Edades <- c(rep(30, 3), 15, 18)
-ID; Nombres; Edades
-ID
-Nombres
-Edades
-#Uniendo todos los vectores
-df1 <- data.frame(ID, Nombres, Edades)
-df1
-
-#Comprobando si los dos data frames son iguales
-df == df1
-
-#Podemos cambiar los nombres de las columnas al crear el data frame con vectores
-colnames(df1)
-df1 <- data.frame(Identificacion = ID, Nombre = Nombres, Edad = Edades)
-df1
-#Reemplazando contenido de un elemento
-df1$Edad[3] <- 0
-df1
-
-#Tambien podemos cambiar los nombres despues de crear el data frame
-colnames(df)
-colnames(df) <- c("id", "nombre", "edad")
-colnames(df)
-
-#Accedemos elementos de la misma manera que con las matrices
-#Fila 1
-df[1,]
-#Columna 3 (edad)
-df[,3]
-df[[3]]
-#También podemos utilizar el nombre de la columna para acceder elementos del data frame
-df$edad
-df["edad"]
-#Fila 1, columna 2 (nombre)
-df[1, 2]
-df$nombre[1]
-df[1, "nombre"]
-
-#Podemos crear una nueva columna facilmente
-df1$NuevaColumna1 <- c("M", "M", "H", "H", NA)
-df1
-#Podemos anidar funciones
-df1$NuevaColumna2 <- c(rep(c("M", "H"), each = 2),  "M")
-df1
-#Podemos incluir un solo valor para toda la columna
-df1$NuevaColumna3 <- 100
-df1
-
-#Podemos hacer operaciones matematicas
-df1$Identificacion*10
-df1$ID <- df1$Identificacion*10
-df1
-df1$Identificacion/df1$ID
-df1$resultado <- df1$Identificacion/df1$ID
-df1
-
-# Factores ----------------------------------------------------------------
-#Nos permite agregar información de manera fácil
-Ciudad <- c(rep("Santa Cruz", 3), "Guayaquil", "Quito")
-Ciudad
-class(Ciudad)
-Ciudad <- factor(Ciudad)
-Ciudad
-class(Ciudad)
-levels(Ciudad)
-
-#Podemos agregar una columna adicional como lo hicimos con las matrices
-df <- cbind(df, Ciudad)
-df
-class(df)
+#Veamos su estructura
 str(df)
+#Tambien podemos ver solo el nombre de las columnas
+colnames(df)
 
-#Alternativamente podemos crear una columna adicional
-df$Ciudad2 <- Ciudad
-df
+#Veamos la primera fila de este data frame
+df[1,]
 
-#Agregando/resumiendo información basado en la columna de factores (ciudad)
-table(df$Ciudad)
-table(df['Ciudad'])
-table(df[,4])
+#Ahora veamos columnas - Todas estas opciones son equivalentes
+head(df[,7])
+head(df[,"equipo_1"])
+head(df[[7]])
+head(df[["equipo_1"]])
+head(df$equipo_1)
 
-#Los factores pueden ser ordenados de acuerdo a un criterio que nosotros definamos
-#Sin ordenar
-mesNacimiento <- factor(c("abril", "enero", "septiembre", "enero", "julio"))
-mesNacimiento
-unclass(mesNacimiento)
-levels(mesNacimiento)
-#Ahora ordenados
-mesNacimiento <- factor(c("abril", "enero", "septiembre", "enero", "julio"), 
-                        levels = c("enero", "abril", "julio", "septiembre"), 
-                        ordered = T)
-mesNacimiento
-levels(mesNacimiento)
+#Puedo acceder a elementos especificos - Todo esto es equivalente
+df[1,7]
+df[1,"equipo_1"]
+df[[7]][1]
+df[["equipo_1"]][1]
+df$equipo_1[1]
 
-#Ahora agregamos esta nueva columna a nuestra base de datos y creemos una tabla
-df <- cbind(df, mesNacimiento)
-df
-table(df$mesNacimiento)
+#Tambien puedo utilizar rangos o secuencias
+df$equipo_1[c(1:2, 8, seq(10, 100, by = 20))]
+#Si quiero saber las 10 ultimas observaciones
+df$equipo_1[(nrow(df)-10):nrow(df)]
 
-#Un factor puede contener mas niveles que los actualmente presentes
-mesNacimiento <- factor(c("abril", "enero", "septiembre", "enero", "julio"), 
-                        levels = c("enero", "febrero", "marzo", "abril", "mayo", "junio", 
-                                   "julio", "agosto", "septiembre", "octubre", "noviembre",
-                                   "diciembre"), ordered = T)
-mesNacimiento
 
-#Si reemplazamos al columna de nacimientos y producimos una tabla
-df$mesNacimiento <- mesNacimiento
-df
-table(df$mesNacimiento)
+# Subconjuntos utilizando comparadores relacionales -----------------------
+#Queremos acceder a datos para partidos desde el 2014 en adelante
+df$anio >= 2014
+#Pero si quiero saber exactamente que filas cumplen este requisito agrego which()
+which(df$anio >= 2014)
+#Puedo utilizar este resultado como listado de las filas que quiero ver
+head(df[which(df$anio >= 2014),])
+head(df[df$anio >= 2014,])
 
-#Podemos acceder y cambiar a un elemento de un factor como hemos visto anteriormente
-levels(mesNacimiento)[10]
-levels(mesNacimiento)[10] <- "Octubre"
-levels(mesNacimiento)[10]
+#Si quiero solo los elementos de ciertas columnas, simplemente agrego las columnas
+#que me interesan
+#Por ejemplo, quiero saber los equipos que se enfrentaron (equipo_1 y equipo_2) en el
+#mundial celebrado en Inglaterra
+df[df$anfitrion == "Inglaterra", c("equipo_1", "equipo_2")]
+df[which(df$anfitrion == "Inglaterra"), 7:8]
 
-# Listas ------------------------------------------------------------------
-Encuesta <- list(ID = ID,
-                 Nombres = Nombres,
-                 Participantes = 5,
-                 Casado = c(T, F, F, T, NA),
-                 Ciudad = Ciudad,
-                 Encuestador = c("Lisa", "Jorge"))
-Encuesta
-class(Encuesta)
-#Número de elementos incluidos en una lista
-length(Encuesta)
 
-#Acceder a elementos de una lista
-Encuesta$Participantes
-Encuesta[['Participantes']]
-Encuesta[3]
+# Subconjuntos con operadores logicos -------------------------------------
+#Queremos acceder a los partidos en los que participo Ecuador desde el 2010
 
-#Acceder a un subelemento en una lista - Tercer elemento en Ciudad
-Encuesta$Ciudad[3]
-Encuesta[['Ciudad']][3]
+#Dividamos esto por partes
+#Primero accedemos a los partidos despues del 2010
+df$anio > 2010
+head(df[df$anio > 2010,])
 
-#Número de elementos dentro de un elemento de la lista
-length(Encuesta$Encuestador)
-length(Encuesta$Nombres)
+#Como identificamos los partidos donde jugo Ecuador
+df$equipo_1 == "Ecuador"
+df[df$equipo_1 == "Ecuador",]
+df$equipo_2 == "Ecuador"
+df[df$equipo_2 == "Ecuador",]
 
-#Cambiar contenido de un elemento de la lista
-Encuesta$ID <- seq(1, 16, by = 3)
-Encuesta
+#Ahora unimos, Ecuador debe aparecer en equipo_1 o en equipo_2
+df$equipo_1 == "Ecuador" | df$equipo_2 == "Ecuador"
+df[df$equipo_1 == "Ecuador" | df$equipo_2 == "Ecuador",]
 
-#Agregando un nuevo elemento a la lista
-Encuesta$ID <- ID
-
-#Cambiar contenido de un sub-elemento de la lista
-Encuesta$Encuestador[2] <- "Pedro"
-Encuesta
-
-#Accediendo nombres de los elementos de la lista y cambiandolos
-names(Encuesta)
-names(Encuesta)[1] <- "Identificación"
-names(Encuesta)
+#Finalmente agregamos el anio
+df$equipo_1 == "Ecuador" | df$equipo_2 == "Ecuador" & df$anio > 2010
+df[df$anio > 2010 & (df$equipo_1 == "Ecuador" | df$equipo_2 == "Ecuador"),]
 
 
 # Funciones ---------------------------------------------------------------
-#Creando una funcion - Calculando el area de un rectangulo (Area = base*altura)
-areaRectangulo <- function(base, altura){
-  return(base*altura)}
-class(areaRectangulo)
-
-#Aplicando una funcion
-areaRectangulo(15, 10)
-AR <- areaRectangulo(15, 10)
-AR
-
-#Utilizando variables en vez de numeros
-b <- 15
-altura <- 10
-areaRectangulo(b, altura)
-
-base <- 15*20
-areaRectangulo(base, altura)
-
 #Creando una funcion con argumentos predefinidos 
 #Area del circulo (Area = pi*radio^2)
-areaCirculo2 <- function(r){
-  pi*r^2
+areaCirculo2 <- function(r, p = pi){
+  p*r^2
 }
+areaCirculo2(20)
 areaCirculo2(20, 3.14)
 
+
+# Estructuras de control  -------------------------------------------------
+#If, else (Si, de otra manera)
+#Por ejemplo, queremos utilizar la clasificacion muy bueno, bueno y malo a los
+#equipos de futbol basados en el numero de veces que han jugado en un mundial
+#Definimos que malo es un equipo que solo aparece tres veces o menos, bueno si aparece 
+#hasta 15 veces y muy bueno si aparece mas de 15 veces
+
+#Primero vamos a crear un nuevo data frame que contenga todos los partidos en los
+#que ha jugado Ecuador. Podemos utilizar el codigo de arriba.
+TotalPartidos <- df[df$equipo_1 == "Ecuador" | df$equipo_2 == "Ecuador",]
+
+#Probemos nuestras condiciones
+#Cuantas veces ha jugado Ecuador en un mundial?
+nrow(TotalPartidos) #porque cada observacion o fila representa un partido
+#Malo si aparece 3 veces
+nrow(TotalPartidos) <= 3
+#Bueno si aparece mas de 3 veces y hasta 15 veces
+nrow(TotalPartidos) > 3 & nrow(TotalPartidos) <= 15
+#Muy bueno si aparece mas de 15 veces
+nrow(TotalPartidos) > 15
+
+#Ahora creemos la estructura si
+if(nrow(TotalPartidos) <= 3){
+  print("Malo")
+}else if(nrow(TotalPartidos) > 3 & nrow(TotalPartidos) <= 15){
+  print("Bueno")
+}else if(nrow(TotalPartidos) > 15){
+  print("Muy bueno")
+}
+# }else{
+#   print("Muy bueno")
+# }
+
+#Probemos con otro pais
+TotalPartidos <- df[df$equipo_1 == "Brasil" | df$equipo_2 == "Brasil",]
