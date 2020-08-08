@@ -29,7 +29,7 @@ colnames(df)
 df[1,]
 
 #Ahora veamos columnas - Todas estas opciones son equivalentes
-head(df[,7])
+head(df[,7], n = 10)
 head(df[,"equipo_1"])
 head(df[[7]])
 head(df[["equipo_1"]])
@@ -61,6 +61,8 @@ head(df[df$anio >= 2014,])
 #que me interesan
 #Por ejemplo, quiero saber los equipos que se enfrentaron (equipo_1 y equipo_2) en el
 #mundial celebrado en Inglaterra
+df$anfitrion == "Inglaterra"
+df$equipo_1
 df[df$anfitrion == "Inglaterra", c("equipo_1", "equipo_2")]
 df[which(df$anfitrion == "Inglaterra"), 7:8]
 
@@ -71,6 +73,7 @@ df[which(df$anfitrion == "Inglaterra"), 7:8]
 #Dividamos esto por partes
 #Primero accedemos a los partidos despues del 2010
 df$anio > 2010
+df$anio >= 2011
 head(df[df$anio > 2010,])
 
 #Como identificamos los partidos donde jugo Ecuador
@@ -91,12 +94,19 @@ df[df$anio > 2010 & (df$equipo_1 == "Ecuador" | df$equipo_2 == "Ecuador"),]
 # Funciones ---------------------------------------------------------------
 #Creando una funcion con argumentos predefinidos 
 #Area del circulo (Area = pi*radio^2)
-areaCirculo2 <- function(r, p = pi){
-  p*r^2
+areaCirculo2 <- function(radio, p = pi){
+  p*radio^2
 }
 areaCirculo2(20)
 areaCirculo2(20, 3.14)
 
+
+IMC <- function(w, h){
+  imc <- w/h^2
+  return(imc)
+}
+
+IMC(70, 1.70)
 
 # Estructuras de control  -------------------------------------------------
 #If, else (Si, de otra manera)
@@ -124,12 +134,21 @@ if(nrow(TotalPartidos) <= 3){
   print("Malo")
 }else if(nrow(TotalPartidos) > 3 & nrow(TotalPartidos) <= 15){
   print("Bueno")
-}else if(nrow(TotalPartidos) > 15){
-  print("Muy bueno")
-}
-# }else{
+# }else if(nrow(TotalPartidos) > 15){
 #   print("Muy bueno")
 # }
+}else{
+  print("Muy bueno")
+}
 
 #Probemos con otro pais
-TotalPartidos <- df[df$equipo_1 == "Brasil" | df$equipo_2 == "Brasil",]
+TotalPartidos <- df[df$equipo_1 == "Brasil" | df$equipo_2 == "Brasil",
+                    c("anio", "ciudad")]
+#Ahora vuelve a correr la estructura si de arriba
+
+#Utilizando operadores logicos y relacionales en tidyverse
+df %>% filter(equipo_1 == "Brasil") %>% 
+  mutate(Class = case_when(equipo_1_final == 0 ~ "malo", 
+                           equipo_1_final >= 1 & equipo_1_final <= 3 ~ "bueno", 
+                           equipo_1_final > 3 ~ "muy bueno"))
+
