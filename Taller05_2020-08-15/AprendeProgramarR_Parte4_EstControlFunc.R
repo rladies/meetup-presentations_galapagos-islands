@@ -322,17 +322,24 @@ plyr::ddply(TotalPartidos, "anfitrion", summarise, N = length(anfitrion))
 
 #Incluyamos esto en nuestra funcion
 prueba4 <- function(pais, anioInicio, anioFin){
-  #Primero filtramos los datos relacionados al pais que nos interesa
-  if(!missing(anioFin)){
-    x <- df[(df$anio >= anioInicio & df$anio <= anioFin) &
+#Primero filtramos los datos relacionados al pais que nos interesa
+if(!missing(anioFin)){
+  x <- df[(df$anio >= anioInicio & df$anio <= anioFin) &
               (df$equipo_1 == pais | df$equipo_2 == pais),]
+    #Guardemos el numero de partidos jugados
+    NPartidos <- nrow(x)
+    #Agregemos una linea adicional en la que revisemos si el pais esta incluido en esta
+    #base de datos
+    if(NPartidos == 0){
+      print("Este pais no tiene partidos registrados en el Mundial de Futbol entre 1930 y 2018")
+    } else {print(paste0(pais, " ha jugado ", NPartidos, " partidos entre el ", anioInicio, " y ", anioFin))}
   } else if(missing(anioFin)){
-    x <- df[df$anio >= anioInicio & (df$equipo_1 == pais | df$equipo_2 == pais),] 
-  }
-  #Agregemos una linea adicional en la que revisemos si el pais esta incluido en esta
-  #base de datos
-  if(nrow(x) == 0){
-    print("Este pais no tiene partidos registrados en el Mundial de Futbol entre 1930 y 2018")
+    x <- df[df$anio >= anioInicio & (df$equipo_1 == pais | df$equipo_2 == pais),]
+    #Guardemos el numero de partidos jugados
+    NPartidos <- nrow(x)
+    if(NPartidos == 0){
+      print("Este pais no tiene partidos registrados en el Mundial de Futbol entre 1930 y 2018")
+    } else {print(paste0(pais, " ha jugado ", NPartidos, " partidos entre el ", anioInicio, " hasta el 2018"))}
   }
   #Aplicamos el bucle for con las estructuras si para la clasificacion, y esta sera
   #guardada en una nueva columna clas
@@ -345,19 +352,18 @@ prueba4 <- function(pais, anioInicio, anioFin){
     }else if(x$equipo_2[i] == pais & (x$equipo_1_final[i] < x$equipo_2_final[i])){
       x$clas[i] <- "Ganado"
       #En cualquier otro caso pierde
-    #Nuestro equipo empata
+      #Nuestro equipo empata
     }else if(x$equipo_1_final[i] == x$equipo_2_final[i]){
-        x$clas[i] <- "Empate"
+      x$clas[i] <- "Empate"
     }else{
       x$clas[i] <- "Perdido"
-    }
-  }
-  #Aqui vamos a condiserar el data frame x, solo la columa Clas y vamos a crear un resumen
-  #crearemos una columna llamada N donde vamos a considerar el largo por cada factor dentro
-  #de Clas (Ganado, Perdido, Empate) y lo dividimos para el numero de filas total de x
-  y <- plyr::ddply(x, "clas", summarise, N = length(clas)/nrow(x))
+    }}
+  #Aqui vamos a considerar el data frame x, solo la columa Clas y vamos a crear un resumen de estos datos que van a ser guardados en una columna llamada Porcentajes
+  #donde vamos a considerar el largo por cada factor dentro de Clas (Ganado, Perdido, Empate) y lo dividimos para el numero de filas total de x y mutiplicamos por 100.
+  #Finalmente vamos a redondear este valor utilizando round
+  y <- plyr::ddply(x, "clas", summarise, Porcentajes = round(length(clas)/nrow(x)*100, 2))
   return(y)
-}
+}  
 
 #Probemos
 prueba4("Francia", 2006, 2010)
