@@ -6,6 +6,6 @@ Este taller se basa en los libros:
 - Santana & Farfán. 2014. El arte de programar en R. Un lenguaje para la estadística. Disponible en https://bit.ly/2ZJnmAe.  
 - Mendoza Vega. 2018. 'R para principantes'. Disponible en: https://bookdown.org/jboscomendoza/r-principiantes4/.  
   
-Puedes acceder al documento de Google Colab para colaborar en vivo o practicar en tu propio tiempo: https://bit.ly/3ad6pSb.  
+Puedes acceder al documento de Google Colab para que compartas tu propia funcion: https://bit.ly/3h1Hq6O.  
   
 Los documentos aquí disponibles son de libre acceso.
