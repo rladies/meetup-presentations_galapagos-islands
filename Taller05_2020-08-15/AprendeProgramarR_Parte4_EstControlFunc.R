@@ -93,6 +93,14 @@ for(i in Vec){
 }
 NuevoVec
 
+#Si queremos reemplazar una letra dentro de un palabra por otra letra o caracter
+#Vamos a utilizar el data frame df para nuestro contador
+for(i in 1:nrow(df)){
+  #Miramos todas las filas dentro de la columna anfitrion y reeplazamos 'a' por '1'
+  #Esto sera guardado en un vector llamado x
+  x[i] <- stringr::str_replace_all(df$anfitrion[i], "a", "1")
+}
+
 #Podemos tambien hacer guardar resultados en un data frame
 #Supongamos que queremos crear una columna llamada ID para identificar las filas
 #de nuestro data frame TotalPartidos
@@ -107,22 +115,21 @@ head(TotalPartidos)
 #data frame TotalPartidos
 
 #Primero creamos un contador
-i <- 1
+i <- 10
 #Ahora creamos nuestro bucle
-while(i <= 5){
-  print(TotalPartidos[i,c("equipo_1", 'equipo_2')])
-  i <- i+1
+while(i <= 50){
+  print(df[i,c("equipo_1", 'equipo_2')])
+  i <- i+10
 }
 
 
 # Bucles con break y next -------------------------------------------------
 #Equivalente a lo que intentamos anteriormente
-for(i in TotalPartidos$ID){
-  if(i == 5){
+for(i in 3:length(TotalPartidos$anio)){
+  if(i > 5){
     break
-  } 
-print(TotalPartidos[i,c("equipo_1", 'equipo_2')])
-}
+  } else{print(TotalPartidos[i,c("equipo_1", 'equipo_2')])
+  }}
 
 #Queremos correr un bucle si nuestro contador es mayor a 10, pero queremos pararlo 
 #si es igual a 15
@@ -140,13 +147,13 @@ while(i > 10){
 #Podemos identificar un numero par utilizando %%. Esto nos dara el resto de la division
 
 #Por ej., el resto de 10 dividido para dos es 0. Esto se representa
-10%%2
+500%%2
 #Ahora revisemos el resto de 11/2
-11%%2
+1071%%2
 #Los numeros pares siempre tendran 0 como resto cuando son dividos para dos
 
 #Ahora armemos el bucle
-for(i in TotalPartidos$ID){
+for(i in 1:length(TotalPartidos$anio)){
   #Si la condicion que es si el resto del numero divido para dos NO es cero, debemos
   #saltar este paso (next)
   if(i%%2 != 0){
@@ -217,6 +224,9 @@ prueba <- function(pais, anioInicio, anioFin){
 
 #Probemos
 prueba("Ecuador", 2006, 2010)
+prueba(anioInicio = 2002, pais = "Ecuador", anioFin = 2010)
+prueba(2002, "Ecuador", 2010)
+
 
 #Ahora debemos considerar que haremos si no nos dan un anio de fin
 #Simplemente utilizamos un if junto con la funcion missing (revisa si un valor fue
@@ -238,7 +248,7 @@ prueba2 <- function(pais, anioInicio, anioFin){
 #Probemos
 prueba2("Ecuador", 2006)
 prueba2("Ecuador", 2006, 2010)
-
+prueba("Ecuador", 2006)
 
 #Como podemos clasificar los partidos en empate, ganado o perdido
 #Creemos un subconjunto de datos para probar
@@ -308,7 +318,7 @@ prueba3("Ecuador", 2006)
 #nuestros datos. Finalmente el resumen dara como resultado la longitud de la columna
 #anfitrion que esta agrupada por pais
 
-plyr::ddply(TotalPartidos, "anfitrion", summarise, N = count(anfitrion))
+plyr::ddply(TotalPartidos, "anfitrion", summarise, N = length(anfitrion))
 
 #Incluyamos esto en nuestra funcion
 prueba4 <- function(pais, anioInicio, anioFin){
@@ -342,18 +352,23 @@ prueba4 <- function(pais, anioInicio, anioFin){
       x$clas[i] <- "Perdido"
     }
   }
-  y <- plyr::ddply(x, "clas", summarise, N = length(clas))
+  #Aqui vamos a condiserar el data frame x, solo la columa Clas y vamos a crear un resumen
+  #crearemos una columna llamada N donde vamos a considerar el largo por cada factor dentro
+  #de Clas (Ganado, Perdido, Empate) y lo dividimos para el numero de filas total de x
+  y <- plyr::ddply(x, "clas", summarise, N = length(clas)/nrow(x))
   return(y)
 }
 
 #Probemos
-prueba4("Ecuador", 2006, 2010)
+prueba4("Francia", 2006, 2010)
 prueba4("Ecuador", 2006)
 #Verifiquemos con resultados anteriores
-prueba3("Ecuador", 2006, 2010)
+prueba3("Francia", 2006, 2010)
 prueba3("Ecuador", 2006)
 
 #Probemos con otros paises y fechas
 prueba4("Peru", 2000)
 #Comprobemos nuestra base
 unique(c(df$equipo_1, df$equipo_2))
+#Peru lleva tilde, asi que ahora si funciona 
+prueba4("Perú", 2000)
