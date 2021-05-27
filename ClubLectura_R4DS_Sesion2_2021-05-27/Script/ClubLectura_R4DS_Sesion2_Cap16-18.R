@@ -9,7 +9,6 @@
 
 # Llamando bibliotecas ----------------------------------------------------
 library(tidyverse)
-library(datos)
 library(lubridate)
 
 
