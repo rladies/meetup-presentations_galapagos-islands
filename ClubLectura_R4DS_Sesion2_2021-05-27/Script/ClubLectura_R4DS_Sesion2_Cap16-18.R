@@ -83,6 +83,12 @@ erupciones %>%
   head()
 #Mucho mejor
 
+#Incluir fecha anio y mes, pero sin formato fecha
+erupciones %>% 
+  mutate(Fecha_corta = as.factor(paste(month.abb[Month], Year, sep = "-"))) %>% 
+  select(Year:Day, Fecha_corta)
+
+
 #Tambien podriamos crear fecha hora con componentes individuales
 erupciones %>% 
   #Crearemos columnas adicionales con horas y minutos. Todas tendran la misma
@@ -108,7 +114,7 @@ as_date(now())
 year(today())
 month(today())
 #Si queremos el nombre del mes anade label = T
-month(today(), label = T)
+month(today(), label = TRUE)
 day(today())
 hour(now())
 minute(now())
@@ -133,7 +139,7 @@ hour(fecha_hora) <- hour(fecha_hora)-5
 fecha_hora
 
 #Update tambien es util 
-update(fecha_hora, year = 2020, month = 2, mday = 2, hour = 2)
+fecha_hora <- update(fecha_hora, year = 2020, month = 2, mday = 2, hour = 2)
 fecha_hora
 fecha_hora %>% update(hour = 48)
 
@@ -188,7 +194,7 @@ erupciones <- erupciones %>%
 
 #Imaginemos que queremos contar el numero de erupciones por trimestre
 erupciones %>% 
-  count(erup_trim = floor_date(Fecha, "quarter")) %>% 
+  count(erup_trim = ceiling_date(Fecha, "quarter")) %>% 
   #Podemos graficar
   ggplot(aes(erup_trim, n)) +
   geom_line()
