@@ -10,6 +10,7 @@
 # Llamando bibliotecas ----------------------------------------------------
 library(tidyverse)
 library(palmerpenguins)
+library(magrittr)
 
 
 # Bucles for --------------------------------------------------------------
@@ -21,16 +22,16 @@ glimpse(ping)
 #Usemos un bucle para calcular el promedio de las medidas de picos, aletas y
 #peso
 #Primero creamos un vector vacio para guardar los resultados
-promedios <- vector()
+promedios1 <- vector()
 
 #Creamos nuestro bucle que estara basado en los nombres de las columnas de
 #nuestro interes
 for(i in names(ping[3:6])){
   #Guardamos los resultados en el vector vacio creado
-  promedios <- append(promedios, mean(ping[[i]], na.rm = T))
+  promedios1 <- append(promedios, mean(ping[[i]], na.rm = T))
 }
 #Veamos los resultados
-promedios
+promedios1
 
 #Otras funciones relevantes para bucles for
 for(i in 1:ncol(ping)){
@@ -49,8 +50,8 @@ for(i in names(ping)){
 
 #Utilizando bucles for para cambiar datos en variables existentes
 #Asumamos que queremos estandarizar los datos morfometricos de los pinguinos
-for(i in names(ping[3:6])){
-  ping[i,] <- scale(ping[[i]])
+for(i in 3:6){
+  print(scale(ping[,i]))
 }
 ping
 
@@ -104,6 +105,14 @@ while(i <= 10){
   }else(print(sprintf("%1.0f es un numero impar", i)))
   i <- i+1
 }
+
+#Bucles con mas de una condicion
+medidas <- medidas %>% drop_na()
+for(i in 1:nrow(medidas)){
+  if(medidas$bill_depth_mm[i] > 20 & medidas$body_mass_g[i] >= 3500){
+    print(medidas[i,])
+    }else(print("No"))
+  }
 
 
 # Programacion funcional --------------------------------------------------
@@ -159,7 +168,7 @@ modelos_especies <- ping %>%
   #Dividimos nuestros datos de acuerdo a la especie
   split(.$species) %>% 
   #Aplicamos los modelos lineales a cada especie por separado
-  map(~lm(body_mass_g ~ flipper_length_mm, data = .x))
+  map(~lm(flipper_length_mm ~ body_mass_g, data = .x))
 #Recuerda que map siempre espera una lista y regresa una lista
 
 #Veamos los resultados - utilizemos un for loop para automatizarlo
@@ -272,7 +281,7 @@ df <- data.frame(
   replacement = c("M", "N", "Z"),
   stringsAsFactors = FALSE
 )
-pmap(df, gsub)
+pmap(df, gsub) %>% flatten_chr()
 #En este caso, gsub usa tres argumentos, por lo que usamos pmap
 
 #Esto equivale a
@@ -324,19 +333,25 @@ datos_morfo2 %>%
 #Creemos una figura de puntos para cada especie de pinguinos
 fig <- ping %>% 
   split(.$species) %>% 
-  map(~ggplot(.x, aes(bill_length_mm, body_mass_g, col = sex)) + geom_point())
+  map(~ggplot(.x, aes(bill_length_mm, body_mass_g, col = sex)) + geom_point()+
+        theme_bw()+
+        labs(x = "Largo del pico (mm)", y = "Peso del animal (g)"))
 
 #Creemos los nombres de la figura con la extension pdf
 nombres <- str_c(names(fig), ".pdf")
 
 #Guardemos las figuras en la carpeta Figuras
-pwalk(list(nombres, fig), ggsave, path = "ClubLectura_R4DS_Sesion4_2021-06-24/Figuras/")
+pwalk(list(nombres, fig), ggsave, path = "ClubLectura_R4DS_Sesion4_2021-06-24/Figuras/", height = 8.9)
 
 
 # Otras funciones utiles --------------------------------------------------
 #Keep mantiene las columnas que cumplen una condicion
 ping %>% 
   keep(is.double)
+
+#Equivalente
+ping %>% 
+  select_if(is.double)
 
 #Discard descarta las columnas que cumplen una condicion
 ping %>% 
