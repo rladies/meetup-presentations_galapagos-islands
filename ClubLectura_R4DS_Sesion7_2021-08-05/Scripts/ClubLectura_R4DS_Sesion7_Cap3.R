@@ -146,3 +146,115 @@ pinguinos %>%
   geom_point(aes(color = species))+
   geom_smooth(data = filter(pinguinos, sex == "female"), color = "purple")+
   geom_smooth(data = filter(pinguinos, sex == "male"), color = "#029534", se = F)
+
+
+# Graficos de barras ------------------------------------------------------
+#Podemos utilizar los datos crudos sin ningun calculo previo para mostrar
+#conteos
+rescates %>% 
+  ggplot(aes(x = cal_year))+
+  geom_bar()
+
+#Esto es equivalente a
+rescates %>% 
+  count(cal_year) %>% 
+  ggplot(aes(x = cal_year, y = n))+
+  #La opcion stat en este caso se refiere a una transformacion estadistica
+  geom_bar(stat = "identity")
+
+#Tambien podemos calcular proporciones directamente con ggplot
+rescates %>% 
+  ggplot(aes(x = cal_year, y = stat(prop)))+
+  geom_bar()
+
+#Verifiquemos resultados
+rescates %>% 
+  count(cal_year) %>% 
+  mutate(prop = n/sum(n))
+
+
+#Podemos hacer mas calculos estadisticos
+pinguinos %>% 
+  ggplot()+
+  #Seleccionamos los ejes
+  stat_summary(aes(x = species, y = body_mass_g),
+               #Establecemos la funciones que vamos a utilizar
+               fun.min = min,
+               fun.max = max,
+               fun = mean)
+
+
+# Ajustes de posicion -----------------------------------------------------
+#Haciendo calculos y cambiando esteticas
+rescates %>% 
+  ggplot(aes(x = cal_year))+
+  geom_bar(aes(fill = animal_group_parent), col = "blue")
+
+#Cambiando la posicion de las columnas
+rescates %>% 
+  filter(cal_year == 2020) %>% 
+  ggplot()+
+  geom_bar(aes(x = cal_year, fill = animal_group_parent), position = "dodge", colour = "grey")
+
+#Regresemos al grafico de puntos de los pinguinos
+pinguinos %>% 
+  ggplot(aes(x = body_mass_g, y = bill_length_mm))+
+  geom_point()
+
+#Vemos que hay puntos que se solapan, si queremos verlos mejor, podemos hacer uso 
+#de la opcion position = 'jitter' para dar un poco de ruido aletorio a cada punto
+pinguinos %>% 
+  ggplot(aes(x = body_mass_g, y = bill_length_mm))+
+  geom_point(position = "jitter")
+
+#O equivalente
+pinguinos %>% 
+  ggplot(aes(x = body_mass_g, y = bill_length_mm))+
+  geom_jitter()
+
+
+# Sistemas de coordenadas -------------------------------------------------
+#Cambiando posicion de ejes
+rescates %>% 
+  ggplot(aes(x = cal_year))+
+  geom_bar(aes(fill = animal_group_parent), col = "grey")+
+  coord_flip()
+
+#Mapas simples
+#Buscamos a Ecuador en el mapa del mundo
+map_data("world", region = "ecuador", exact = F) %>% 
+  #Establecemos a longitud y latitud como ejes
+  ggplot(aes(long, lat, group = group))+
+  geom_polygon()
+
+#Podemos mejorarlo especificando que es un mapa
+map_data("world", region = "ecuador", exact = F) %>% 
+  ggplot(aes(long, lat, group = group))+
+  geom_polygon(fill = "#bce9b6", colour = "#9a979f")+
+  #Esta opcion nos permite aplicar varias proyecciones
+  coord_quickmap()
+
+#Coordenadas polares
+#Utiles si queremos hacer graficos de torta
+rescates %>% 
+  mutate(animal_group_parent = case_when(animal_group_parent == "cat" ~ "Cat",
+                                         T ~ animal_group_parent)) %>% 
+  ggplot(aes(x = animal_group_parent))+
+  geom_bar(aes(fill = animal_group_parent), width = 1, show.legend = F)+
+  theme(aspect.ratio = 1)+
+  coord_polar()
+
+#Comparemos con el grafico de barras
+rescates %>% 
+  mutate(animal_group_parent = case_when(animal_group_parent == "cat" ~ "Cat",
+                                         T ~ animal_group_parent)) %>% 
+  ggplot(aes(x = animal_group_parent))+
+  geom_bar(aes(fill = animal_group_parent))
+
+#Si queremos un grafico de torta
+pinguinos %>% 
+  ggplot()+
+  #Podemos utilizar 1 como el eje x
+  geom_bar(aes(x = factor(1), fill = species))+
+  #Theta se refiere al eje que va a ser utilizado para dar el angulo del circulo
+  coord_polar(theta = "y")
