@@ -10,7 +10,6 @@
 # Llamando bibliotecas ----------------------------------------------------
 library(tidyverse)
 library(palmerpenguins)
-library(magrittr)
 
 
 # Cargando datos ----------------------------------------------------------
@@ -69,6 +68,7 @@ pinguinos %>%
 
 #Nota que podemos incluir varias esteticas en un mismo grafico
 pinguinos %>% 
+  drop_na() %>% 
   #Nota que ahora tenemos la opcion size (tamanio) incluida en la estetica
   ggplot(aes(x = body_mass_g, y = bill_length_mm, size = body_mass_g, 
              color = species, shape = sex, alpha = bill_length_mm))+
@@ -87,7 +87,8 @@ pinguinos %>%
   #Nota que ahora las esteticas van fuera de aes, esto es porque los estamos
   #estableciendo de manera manual
   ggplot()+
-  geom_point(aes(x = body_mass_g, y = bill_length_mm), color = "red", shape = 0)
+  geom_point(aes(x = body_mass_g, y = bill_length_mm), color = "red", 
+             shape = 0)
 
 #Como recuerdo las opciones en una funcion
 ?geom_point
@@ -116,7 +117,8 @@ pinguinos %>%
 #Volvamos a hacer el grafico del pico y peso de los pinguinos
 pinguinos %>% 
   ggplot()+
-  geom_point(aes(x = body_mass_g, y = bill_length_mm))
+  geom_point(aes(x = body_mass_g, y = bill_length_mm))+
+  theme(axis.text = element_text(family = "sans", size = 16))
 
 #Podemos graficar estos datos de otra manera para mostrar una tendencia
 pinguinos %>% 
@@ -182,7 +184,7 @@ pinguinos %>%
                fun.min = min,
                fun.max = max,
                fun = mean)
-
+?stat_summary
 
 # Ajustes de posicion -----------------------------------------------------
 #Haciendo calculos y cambiando esteticas
@@ -194,7 +196,8 @@ rescates %>%
 rescates %>% 
   filter(cal_year == 2020) %>% 
   ggplot()+
-  geom_bar(aes(x = cal_year, fill = animal_group_parent), position = "dodge", colour = "grey")
+  geom_bar(aes(x = cal_year, fill = animal_group_parent), 
+           position = "dodge", colour = "grey")
 
 #Regresemos al grafico de puntos de los pinguinos
 pinguinos %>% 
@@ -218,7 +221,8 @@ pinguinos %>%
 rescates %>% 
   ggplot(aes(x = cal_year))+
   geom_bar(aes(fill = animal_group_parent), col = "grey")+
-  coord_flip()
+  coord_flip()+
+  theme_minimal()
 
 #Mapas simples
 #Buscamos a Ecuador en el mapa del mundo
@@ -257,4 +261,4 @@ pinguinos %>%
   #Podemos utilizar 1 como el eje x
   geom_bar(aes(x = factor(1), fill = species))+
   #Theta se refiere al eje que va a ser utilizado para dar el angulo del circulo
-  coord_polar(theta = "y")
+  coord_polar(theta = "x")
