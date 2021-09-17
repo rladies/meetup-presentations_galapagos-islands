@@ -188,7 +188,7 @@ ping %>%
 #Comparando dos variables continuas
 #Que pasa si comparamos el peso con el largo del pico?
 ping %>% 
-  ggplot(aes(x = body_mass_g, y = bill_length_mm))+
+  ggplot(aes(x = body_mass_g, y = bill_length_mm, col = species))+
   geom_point()
 #Al parecer los pinguinos mas pequenios tienen picos mas pequenios
 
@@ -208,6 +208,13 @@ ping %>%
   ggplot(aes(x = body_mass_g, y = bill_length_mm))+
   #Definimos los grupos por la masa, cada 500 g
   geom_boxplot(aes(group = cut_width(body_mass_g, 500)))
+
+#Numero de grupos con cut_number
+ping %>% 
+  ggplot(aes(x = body_mass_g, y = bill_length_mm))+
+  #Definimos los grupos por la masa, cada 500 g
+  geom_boxplot(aes(group = cut_number(body_mass_g, 5)))+
+  geom_point()
 
 #Si queremos tener una idea de la cantidad de datos incluidos en
 #cada grupo podemos usar el parametro varwidth = TRUE en geom_boxplot
