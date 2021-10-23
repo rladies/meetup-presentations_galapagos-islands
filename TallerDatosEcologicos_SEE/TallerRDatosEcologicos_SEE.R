@@ -206,8 +206,7 @@ ping_boot
 #largo del pico?
 #Usemos una regresion linear simple (https://www.tidymodels.org/find/parsnip/)
 espec_lm <- linear_reg() %>% 
-  set_engine("lm") %>% 
-  set_mode("regr")
+  set_engine("lm") 
 
 #El flujo de trabajo necesita una formula para la regresion
 flujo_trabajo_lm <- workflow() %>% 
