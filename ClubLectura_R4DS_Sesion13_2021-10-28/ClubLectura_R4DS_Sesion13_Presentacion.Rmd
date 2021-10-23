@@ -1,0 +1,103 @@
+---
+title: "Mi primera presentacion"
+author: "Denisse Fierro Arcos"
+date: "2021-10-28"
+output: ioslides_presentation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Disenando mi primera presentacion
+
+Utilizando un archivo de Rmarkdown y la opcion `output: ioslides_presentation` creamos esta presentacion sencilla que puede ser compartida con facilidad y vista en cualquier navegador web.
+
+Recuerda que cada encabezado de primer (`#`) o segundo nivel (`#`) creara una nueva diapositiva.
+
+
+## Presentacion con Palmer Penguins
+Supongamos que quisieramos presentar resultados de un analisis de datos.
+
+Utilicemos al paquete Palmer Penguins como base para este analisis.
+
+<center>
+![Paquete Palmer Penguins](logoPP.png)
+</center>
+
+
+## Comparacion de peso y largo de pico por especie
+
+```{r, echo = F, fig.align = "center", message = F, warning = F}
+library(tidyverse)
+library(palmerpenguins)
+
+penguins %>% 
+  drop_na() %>% 
+  ggplot(aes(body_mass_g, bill_length_mm, col = species))+
+  geom_point()+
+  geom_smooth(method = "lm")+
+  labs(x = "Peso (g)", y = "Largo del pico (mm)", col = "Especies", 
+       title = "Comparacion de peso y largo del pico de tres especies de pinguinos de Antartida")
+```
+  
+## Resultados analisis estadisticos
+**Resultados pinguinos Adelie**
+```{r estadistica, echo = F, fig.align = "center", message = F, warning = F}
+library(xtable)
+library(knitr)
+library(kableExtra)
+library(magrittr)
+
+#Definimos una funcion para analisis linear
+modelo_aleta_peso <- function(datos){
+  lm(flipper_length_mm ~ body_mass_g, data = datos)}
+
+#Anidamos datos
+res <- penguins %>% 
+  #Removemos observaciones con valores NA
+  drop_na() %>% 
+  #Agrupamos por especie y sexo
+  group_by(species) %>% 
+  nest() %>% 
+  mutate(modelo = map(data, modelo_aleta_peso)) 
+
+res %>% 
+  filter(species == "Adelie") %$% 
+  summary(modelo[[1]]) %>% 
+  xtable() %>% 
+  kable(digits = 3) %>% 
+  row_spec(0, bold = T) %>% 
+  row_spec(1:2, font_size = 18)
+```
+  
+  
+**Resultados pinguinos Gentoo**
+```{r}
+res %>% 
+  filter(species == "Gentoo") %$% 
+  summary(modelo[[1]]) %>% 
+  xtable() %>% 
+  kable(digits = 3) %>% 
+  row_spec(0, bold = T) %>% 
+  row_spec(1:2, font_size = 18)
+```
+  
+  
+**Resultados pinguinos Barbijos**
+```{r}
+res %>% 
+  filter(species == "Chinstrap") %$% 
+  summary(modelo[[1]]) %>% 
+  xtable() %>% 
+  kable(digits = 3) %>% 
+  row_spec(0, bold = T) %>% 
+  row_spec(1:2, font_size = 18)
+```
+
+## Conclusion
+Existe una correlacion positiva y significativa entre el peso del animal y el largo del pico para las tres especies examinadas.
+
+
+
+
