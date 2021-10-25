@@ -1,0 +1,323 @@
+---
+title: "Capítulo 27. R Markdown"
+subtitle: "Club de Lectura de R para Ciencia de Datos"
+author: 
+- Linda Cabrera Orellana^[Universidad Técnica de Machala (Ecuador)]
+- Denisse Fierro Arcos^[University of Tasmania (Australia)]
+#date: '\today'
+#date: "24 de octubre de 2021"
+abstract: "Este documento es una guía de R Markdown, el cual provee un marco de escritura para ciencia de datos, que combina tu código, sus resultados y tus comentarios en prosa. Los documentos de R Markdown son completamente reproducibles y soportan docenas de formatos de salida tales como PDFs, archivos de Word, presentaciones y más. En esta caso explicaremos *pdf_document*."
+keywords: "pandoc, r markdown, knitr"
+date: '`r format(Sys.Date(), "%d %B, %Y")`'
+#csl: "apa.csl"
+#fontsize: 11pt
+linkcolor: green
+urlcolor: green
+bibliography: master.bib
+output: 
+ pdf_document: 
+   number_sections: yes
+   toc: yes
+   citation_package: natbib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Elementos básicos de R Markdown
+
+Contiene tres tipos importantes de contenido:
+
+1. Un encabezado YAML (opcional) rodeado de ---
+
+2. Bloques de código de R rodeados de ```.
+
+3. Texto mezclado con formateos de texto simple como # Encabezado e _itálicas_.
+
+
+# Encabezado YAML 
+
+## Formato general: encabezado YAML
+
+YAML es la sigla en inglés de la frase *“yet another markup language”*, que significa *“otro lenguaje de marcado más”*. Este lenguaje de marcado está diseñado para representar datos jerárquicos de modo tal que sea fácil de escribir y leer para humanos. R Markdown lo utiliza para controlar muchos detalles del output. 
+
+Este encabezado determina los parámetros generales de formato para el reporte a compilar. En lenguaje computacional se entiende como los metadatos del documento; esto es, información que define el formato del archivo resultante, más no su contenido:
+
+* **Título (title).** Texto entre comillas que servirá de título general del documento.
+
+* **Subtítulo (subtitle).** Texto entre comillas que servirá de subtítulo para el título general del documento.
+
+* **Autor (author).** Texto entre comillas para indicar el nombre del o los autores.
+
+* **Resumen (Abstract).** Texto entre comillas para indicar el resumen del documento.
+
+* **Fecha (date).** Campo para indicar la fecha. En el texto, con la expresión *today*, se solicita que imprima la fecha actual según el calendario del sistema operativo.
+
+* **Formato de bibliografía (csl).** Nombre de un archivo de extensión .csl para indicar el formato de referencias en el cuerpo del texto y el listado de bibliografía al final del documento. La sigla refiere a Estilo del Lenguaje de Referencias (Citation Language Style) y permite definir si se usarán citas al estilo APA, ASA, Chicago, etc. Se adecúa a los diferentes requerimientos de referencias bibliográficas.
+
+* Los argumentos dentro del apartado resultado (output) son los siguientes:
+
+  * **pdf_document:** indica el formato preestablecido para compilar el documento. En este caso, se trata de un PDF. Puede ser *html_document* o *word_document*.
+
+  * **fig_caption:** indica si las figuras deben incorporar leyendas.
+Es *true* por default.
+
+  * **number_sections:** si está definido como yes define que se numerarán los títulos y sutítulos a lo largo del documento, de manera automática y correlativa.
+
+  * **toc:** es la abreviación de table of contents.
+
+
+## Opciones LaTeX
+
+Muchos aspectos de la plantilla LaTeX utilizada para crear documentos PDF se pueden personalizar utilizando metadatos YAML de nivel superior (tenga en cuenta que estas opciones no aparecen debajo de la sección de salida, sino que aparecen en el nivel superior junto con el título, el autor, etc.) . Por ejemplo:
+
+* **fontsize:**	Tamaña de la fuente (10pt, 11pt, or 12pt).
+
+* **documentclass:**	Clases de documentos de LaTeX (article, book, etc.)
+
+* **linkcolor, urlcolor, citecolor:**	Colores para links externos, internos y citas.
+
+
+# Bloques de código de R o *chunks*
+
+Hay tres maneras para hacerlo:
+
+1. Con el atajo de teclado: Cmd/Ctrl + Alt + I
+
+2. Con el ícono “Insert” en la barra de edición
+
+3. Tipeando manualmente los delimitadores de bloque ```{r} y ```.
+
+
+## Opciones de chunks
+
+Knitr provee casi 60 opciones que puedes usar para personalizar tus bloques de código. Puedes ver la lista completa en [Opciones de bloques](http://yihui.name/knitr/options/).
+
+
+
+### No muestra el código pero lo ejecuta y no muestra resultados (include = FALSE)
+
+```{r cod1, include=FALSE}
+
+# Cargamos los paquetes
+library(tidyverse)
+library(palmerpenguins)
+
+```
+
+
+### Muestra el código pero no lo ejecuta (eval = FALSE)
+
+```{r cod2, eval=FALSE}
+
+# Cargamos los paquetes
+library(tidyverse)
+library(palmerpenguins)
+
+# Media de masa corporal de los pinguinos por especie
+penguins %>% 
+    group_by(species) %>% 
+    drop_na() %>% 
+    summarise(
+        Masa_Corporal_media = mean(body_mass_g))
+
+```
+
+
+### No se muestra el código pero se visualizan los resultados (echo = FALSE)
+
+```{r cod3, echo=FALSE}
+
+# Media de masa corporal de los pinguinos por especie
+penguins %>% 
+    group_by(species) %>% 
+    drop_na() %>% 
+    summarise(
+        Masa_Corporal_media = mean(body_mass_g))
+
+```
+
+
+
+
+### Continúa renderizando aunque el código muestre un error. Muestra las advertencias del código (message=TRUE, warning=TRUE)
+
+```{r cod4, message=TRUE, warning=TRUE}
+
+# Media de masa corporal de los pinguinos por especie
+penguins %>% 
+    group_by(species) %>% 
+    drop_na() %>% 
+    summarise(
+        Masa_Corporal_media = mean(sex))
+
+```
+
+
+### Muestra el código y lo ejecuta
+
+```{r cod5}
+
+# Media de masa corporal de los pinguinos por especie
+penguins %>% 
+    group_by(species) %>% 
+    drop_na() %>% 
+    summarise(
+        Masa_Corporal_media = mean(body_mass_g))
+
+```
+
+
+## Tablas
+
+Podemos dar un mejor formato a nuestras tablas con *knitr::kable* e incluir una referencia a la tabla.
+
+```{r cod6}
+
+knitr::kable(
+  penguins %>% 
+    group_by(species) %>% 
+    drop_na() %>% 
+    summarise(
+        Masa_Corporal_media = mean(body_mass_g)),
+  caption = "Promedio de masa corporal por especie"
+)
+
+```
+
+
+## Código dentro de una línea
+
+Podemos incluir código dentro del texto, por ejemplo:
+
+Nuestra data *palmerpenguins* contiene la información de `r nrow(penguins)` pinguinos. Los pinguinos tienen una masa corporal promedio de `r mean(penguins$body_mass_g, na.rm = TRUE)` g.
+
+Si quiero formatear los número, puedo crear una función:
+
+```{r cod7}
+coma <- function(x) format(x, digits = 2, nsmall = 2, big.mark = ",", small.mark = ".")
+
+```
+
+Ahora nuestro ejemplo quedaría:
+
+Nuestra data *palmerpenguins* contiene la información de `r nrow(penguins)` pinguinos. Los pinguinos tienen una masa corporal promedio de `r coma(mean(penguins$body_mass_g, na.rm = TRUE))` g.
+
+
+
+# Formateo de texto
+
+Existe una hoja de referencia útil que la obtienes en Help > Markdown Quick Reference.
+
+## Expresiones Matemáticas 
+
+Ejemplo 1: Utilice la integración por partes para evaluar la siguiente integral $\displaystyle\int x e^x dx$.
+
+Ejemplo 2: Utilice la integración por partes para evaluar la siguiente integral: $$\displaystyle\int x e^x dx$$
+
+Puedes encontrar más fórmulas en el siguiente [link](http://metodos.fam.cie.uva.es/~latex/apuntes/apuntes3.pdf).
+
+
+## Citas
+
+Podemos utilizar dos formatos. Elprimero es sencillo, como sigue a continuación:
+
+> "Comprender las cosas que nos rodean es la mejor preparación para comprender las cosas que hay mas allá."
+>
+> --- Hipatia
+
+
+El segundo requiere que instales el paquete *tufte*.
+
+> "Comprender las cosas que nos rodean es la mejor preparación para 
+> comprender las cosas que hay mas allá."
+> `r tufte::quote_footer('--- Hipatia')`
+
+
+## Insertar imágenes
+
+![R Markdown de Allison Horst](rmarkdown_rockstar.png){width="300"}
+
+## Incluir bibliografía
+
+Este Club de Lectura se basó en el libro *"R para Ciencia de Datos"* de @hadley2021. Lo puedes encontrar de forma gratuita en la web en el link [R para Ciencia de Datos](https://es.r4ds.hadley.nz/index.html).
+
+
+# Generando documentos
+Recuerda que puedes utilizar Rmarkdown para generar varios tipos de archivo, no solo `html` como estamos utilizando en este documento. Para cambiar el tipo de archivo que produce este documento a Microsoft Word, por ejemplo, puedes cambiar `output: word_document` en el encabezado.  
+
+Tambien puedes definirlo programaticamente utilizando la funcion `render` del paquete `rmarkdown`, asi: `rmarkdown::render("nombreDelArchivo.Rmd", output_format = "word_document")`. Esto es especialmente util si tienes un script que llama a Rmarkdown para producir un documento.
+
+Si quisieramos producir mas de un formato de archivo para un mismo documento Rmarkdown podemos modificar el YAML de la siguiente manera.
+
+```{r, eval = F}
+output:
+  html_document: default
+  word_document: default
+```
+
+Incluimos `default` al lado de cada tipo de archivo porque no vamos a modificar ninguno de sus parametros. Luego podemos crear ambos documentos utilizando la siguiente linea de codigo: `rmarkdown::render("nombreDelArchivo.Rmd", output_format = "all")`.
+
+
+## Tipos de documentos disponibles
+* Documentos de texto
+  * `html_document`
+  * `html_notebook` el cual no solamente crea un documento html pero tambien otros documentos de soporte, incluyendo el codigo fuente. Es una buena manera de compartir resultados de analisis.
+  * `word_document`, su version libre `odt_document`
+  * `pdf_document`
+  * `rtf_document` que son archivos de texto enriquecidos que pueden ser utilizados en cualquier sistema operativo
+  * `md_document` que es un markdown simple, o `github_document` que es un markdown especificamente disenado para ser compatible con GitHub.
+
+* Presentaciones
+  * `ioslides_presentation`
+  * `slidy_presentation`
+  * `beamer_presentation`
+
+* Tableros de control (dashboards)
+
+* Sitios web
+
+# Personalizando documentos
+Rmarkdown es flexible y te permite personalizar tu documento tal como lo puedes hacer en un archivo de Microsoft Word. Abajo de incluimos una lista de opciones que tienes disponibles.  
+
+## Tabla de contenido
+Supongamos que quisieras que los nombres de cada seccion sea utilizados como una tabla de contenido. Esto lo puedes hacer modificando el encabezado YAML de la siguiente manera.
+
+```{r, eval = F}
+output: 
+  html_document:
+    toc: true
+```
+
+Nota que `html_document` no esta en la misma linea que la opcion `output` como lo vimos anteriormente, sino que aparece en la linea abajo. Esto es porque `html_document` tiene varios parametros que pueden ser modificados, incluyendo la table de contenido (`toc`). Puedes ver otros parametros disponibles bajo `html_document` en la pestana de ayuda o usando `?html_document`.  
+
+Nota que podemos modificar la tabla de contenidos para que incluya una lista numerada de la siguiente manera.
+```{r, eval = F}
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+```
+
+## Cambiando variables globales
+Si quieras aplicar un cambio al formato por defecto que aplique a todos los bloques de codigo, esto lo puedes hacer con una linea de codigo, en vez de cambiar el formato en cada bloque de manera individual. Si, por ejemplo, quieres ejecutar codigo pero no quieres que el codigo se muestre en ninguna parte del documento, puedes usar: `knitr::opts_chunk$set(echo = FALSE)`. Recuerda que esta linea de codigo debera ir al inicio del documento y estar dentro de un bloque de codigo para que funcione. 
+
+Otra manera de esconder los bloques de codigo es haciendolo desde el encabezado YAML asi:
+
+```{r, eval = F}
+output:
+  html_document:
+    code_folding: hide
+```
+
+
+<!--
+# References
+\setlength{\parindent}{-0.2in}
+\setlength{\leftskip}{0.2in}
+\setlength{\parskip}{8pt}
+\vspace*{-0.2in}
+\noindent
+-->
+
