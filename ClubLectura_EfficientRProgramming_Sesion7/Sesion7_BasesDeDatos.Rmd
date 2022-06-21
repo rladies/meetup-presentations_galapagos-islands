@@ -1,0 +1,212 @@
+---
+title: "Sesion 7 del Club de Lectura 'Efficient R Programming'" 
+author: "Denisse Fierro Arcos"
+date: '2022-06-20'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Este Club de Lectura es una colaboracion entre la Universidad Nacional de Colombia y los capitulos R-Ladies de Barranquilla, Medellin (COL) y Galapagos (ECU).
+
+En esta guia ligada a la septima sesion estaremos cubriendo como conectarnos con bases de datos `SQL` desde R. Tambien hablaremos sobre como procesar datos usando el paquete `data.table`.
+
+## Trabajando con bases de datos en R
+Usar bases de datos en nuestros analisis ayuda a evitar sobrecargar la memoria RAM. Esto es especialmente relevante cuando trabajamos con bases de datos que contienen miles o millones de observaciones.
+
+Como siempre, empecemos llamando a librerias relevantes.
+
+```{r librerias_bases}
+library(RSQLite)
+library(DBI)
+```
+
+Ahora necesitamos crear una conexion que nos permita trabajar con bases de datos.
+
+```{r con_bases}
+con_bases <- datasetsDb()
+```
+
+A pesar que parece que no ocurrio nada, podemos verificar que una conexion ha sido creada llamando a la variable que contiene esta conexion `con_bases`.
+
+```{r echo = F}
+con_bases
+```
+
+Ahora que tenemos una conexion lista, podemos crear una lista de las bases de datos que tenemos disponibles.
+
+```{r lista_bases}
+dbListTables(con_bases)
+```
+
+**NOTA:** Si tienes acceso a un sistema de manejo de bases de datos (DMBS), entonces puedes conectarte al mismo usando la
+funcion `dbConnect`. Deberas asegurarte de tener a la mano tu usuario, clave, nombre y puerto del host, asi como el nombre de la base de datos a la que quieres acceder.
+
+Debido a que no tenemos acceso a un DBMS que sea publico no podemos usar esta opcion. Pero abajo incluimos el codigo que deberias usart
+
+```{r con_bases_driver, eval=FALSE}
+con <- dbConnect(SQLite(), user = "nombre_usuario",
+                 password = "clave",
+                 host = "nombre_host",
+                 port = "puerto_host",
+                 dbname = "nombre_base_datos")
+```
+
+Volviendo a las bases de datos que tenemos disponibles a traves del paquete `RSQLite`, vamos a escoger la base `quakes` para este ejemplo.
+
+Para cargar la base de datos a nuestra sesion de R utilizamos la funcion `dbReadTable`.
+
+```{r}
+base_terremoto <- dbReadTable(con_bases, "quakes")
+head(base_terremoto)
+```
+
+Pero tambien tenemos la opcion de escoger una muestra de estos datos basados en una condicion. Por ejemplo, terremotos con magnitud mayor a 5.
+
+```{r}
+terremotos <- dbGetQuery(con_bases, "SELECT * FROM quakes WHERE mag >= 5")
+head(terremotos)
+```
+
+Para no cargar toda la base a la memoria, vamos a mostrar solo las primeras cinco lineas.
+
+```{r}
+terremotos_2 <- dbSendQuery(con_bases, "SELECT * FROM quakes WHERE mag >= 5")
+dbFetch(terremotos_2, n = 5)
+```
+Podemos tambien usar el paquete `tidyverse` para poder manipular las bases de datos de manera mas eficiente. Primero vamos a cargar el paquete.
+
+```{r warning = F, message = F}
+library("tidyverse")
+```
+
+Podemos entonces cargar la base de datos con tidyverse. Podemos cargarla completamente.
+
+```{r}
+con_bases %>% 
+  tbl("quakes") %>% 
+  head()
+```
+
+Pero tambien podemos seleccionar una parte de la base de datos basados en una condicion. Aqui tenemos dos opciones, utilizar la funcion `sql` para hacer la seleccion de datos.
+
+```{r}
+con_bases %>% 
+  tbl(sql("SELECT * FROM quakes WHERE mag >= 5")) %>% 
+  head()
+```
+
+Tambien podemos simplemente cargar la base de datos como un data frame o tabla y utilizar funciones de tidyverse para seleccionar datos basados en las mismas condiciones.
+
+```{r}
+tbl(con_bases, "quakes") %>% 
+  filter(mag >= 5) %>% 
+  head()
+```
+
+Con esta ultima opcion es facil crear graficos con las bases de datos en un solo chunk de codigo.
+
+```{r}
+tbl(con_bases, "quakes") %>% 
+  ggplot(aes(x = mag, y = depth))+
+  geom_point()
+```
+
+Una vez que terminemos de utilizar las bases de datos podemos desconectarnos.
+
+```{r}
+dbDisconnect(conn = con_bases)
+```
+
+Finalmente, tambien es posible crear una base de datos SQL desde R en unas pocas lineas de codigo. Primero debemos crear una base de datos SQL.
+
+```{r}
+#Vamos a utilizar SQLite para crear nuestra base de datos y la vamos a guardar en nuestra memoria.
+mi_base <- dbConnect(SQLite(), "")
+
+#Verificamos que ha sido creada exitosamente
+mi_base
+```
+
+Ahora vamos a guardar tres bases de datos que estan disponibles en paquetes de R: `mtcars`, `iris` y `starwars`. Empecemos con `mtcars`, la vamos a guardar tal como esta en R.
+
+```{r}
+copy_to(mi_base, mtcars)
+dbListTables(mi_base)
+```
+
+Ahora guardaremos solo dos columnas de `iris`.
+
+```{r}
+copy_to(mi_base, iris, indexes = list("Petal.Width", "species"))
+dbListTables(mi_base)
+```
+ 
+Finalmente guardaremos `starwars`. Debido a que esta tibble incluye listas en ciertas columnas y estas no son compatibles con bases de datos SQL, vamos a seleccionar solo las columnas que no contengan listas.
+
+```{r}
+dbWriteTable(mi_base, "starwars", starwars %>% select(!where(is_list)))
+dbListTables(mi_base)
+```
+Podemos acceder a estos datos tal como lo hicimos anteriormente con el paquete `tidyverse`.
+
+```{r}
+mi_base %>% 
+  tbl("starwars")
+```
+
+O tenemos la opcion de cargarlo como una base de SQL.
+
+```{r}
+dbReadTable(mi_base, "starwars")
+```
+
+No olvidemos de cerrar nuestra sesion.
+
+```{r}
+dbDisconnect(mi_base)
+```
+
+
+## Procesando datos con `data.table`
+El paquete `data.table` ofrece otra opcion para manipular datos en R, pero tiene funciones similares a las ofrecidas por el paquete `dplyr` que esta incluido en el `tidyverse`. Ambos paquetes son eficientes para el procesamiento de datos y cual es utilizado dependera de la preferencia de la persona que programa. En esta seccion mostramos un ejemplo de como utilizar el paquete `data.table` para seleccionar datos basados en una condicion.
+
+Empecemos cargando las librerias que vamos a necesitar para esta seccion.
+
+```{r message = F, warning = F}
+library(data.table)
+library(datos)
+```
+
+Ahora vamos a cargar los datos `paises` desde el paquete `datos` como un `data.table`.
+
+```{r}
+datos_paises <- data.table(paises)
+datos_paises
+```
+
+Podemos hacer una seleccion de datos basados en una condicion, similar a la funcion `filter` de la siguiente manera.
+
+```{r}
+datos_paises[pais == "Ecuador" | pais == "Colombia"]
+```
+
+Podemos ordernar nuestros datos utilizando columnas para hacer la busqueda de datos de manera mas eficiente.
+
+```{r}
+setkey(datos_paises, pais)
+a <- datos_paises[.("Ecuador")]
+a
+```
+
+Podemos agregar mas filas con resultados de otros paises.
+
+```{r}
+a %>% 
+  bind_rows(datos_paises[.("Colombia")])
+```
+
+Tal como dijimos al inicio, el mejor paquete para la manipulacion de datos es el que resulte mas comodo para cada persona. No existe una sola respuesta correcta, ya que cada persona tendra preferencias o limitaciones especificas que influencien la decision final de los paquetes que sera utilizados en el proyecto.
+
